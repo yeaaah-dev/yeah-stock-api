@@ -1,4 +1,5 @@
-import { Column, CreateDateColumn, Entity, PrimaryColumn, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, PrimaryColumn, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Supplier } from "../../Suppliers/entities/Supplier";
 
 @Entity("products")
 class Product {
@@ -42,15 +43,18 @@ class Product {
     currency: string;
 
     @Column()
-    fornecedor: string;
-
-    @Column()
     active: boolean;
+
+    @ManyToMany(() => Supplier, (supplier) => supplier.products)
+    @JoinTable({
+        name: "products_suppliers"
+    })
+    suppliers: Supplier[];
 
     @Column({
         type: "text",
     })
-    descricao: string;
+    description: string;
 
     @CreateDateColumn({
         name: "createdat"
