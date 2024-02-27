@@ -32,8 +32,13 @@ class ProductsController {
         const { name } = request.query;  //TODO: Search por name -> enum Status active e inactive e all
         const userId = request.user.id;
 
+        let search = name as string;
+        if (!search) {
+            search = "";
+        }
+
         const service = new ProductsService();
-        const output = await service.getList(userId, (name as string));
+        const output = await service.getList(userId, search);
 
         return response.status(200).send(output);
     }

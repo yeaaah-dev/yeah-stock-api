@@ -23,13 +23,13 @@ class ProductsService {
         
         if (productAlredyExists) return;
 
-        const suppliers = await suppliersRepository.find({
-            where: {
-                id: In(input.suppliersIds)
-            }
-        });
+        // const suppliers = await suppliersRepository.find({
+        //     where: {
+        //         id: In(input.suppliersIds)
+        //     }
+        // });
 
-        input.suppliers = suppliers;
+        // input.suppliers = suppliers;
         input.user = user;
 
         const product = productsRepository.create(input);

@@ -52,6 +52,9 @@ class Product {
     })
     suppliers: Supplier[];
 
+    @Column()
+    supplier: string;
+
     @Column({
         type: "text",
     })
