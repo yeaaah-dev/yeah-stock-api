@@ -29,14 +29,11 @@ class ProductsController {
     }
 
     async getList(request: Request, response: Response): Promise<Response> {
-        const { skip, take } = request.query;  //TODO: Search por name -> enum Status active e inactive e all
+        const { name } = request.query;  //TODO: Search por name -> enum Status active e inactive e all
         const userId = request.user.id;
 
-        const parsedSkip = parseInt(skip as string);
-        const parsedTake =  parseInt(take as string)
-
         const service = new ProductsService();
-        const output = await service.getList(userId, parsedSkip, parsedTake);
+        const output = await service.getList(userId, (name as string));
 
         return response.status(200).send(output);
     }

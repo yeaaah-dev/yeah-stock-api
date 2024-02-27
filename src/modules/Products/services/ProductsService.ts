@@ -1,5 +1,5 @@
 import { suppliersRepository } from './../../Suppliers/repositories/suppliersRepository';
-import { In } from "typeorm";
+import { In, Like } from "typeorm";
 import { Product } from "../entities/Product";
 import { productsRepository } from "../repositories/productsRepository"
 import { usersRepository } from '../../Users/repositories/usersRepository';
@@ -54,19 +54,20 @@ class ProductsService {
         return product;
     }
 
-    async getList(userId: string, skip: number, take: number): Promise<Product[]>{
-        const products = await productsRepository.find({
-            skip: skip ,
-            take: take,
-            where: {
-                user: {
-                    id: userId
-                }
-            },
-            relations: {
-                suppliers: true
-            }
-        });
+    async getList(userId: string, name: string = ""): Promise<Product[]>{
+        const products = await productsRepository.findByName(userId, name);
+
+        // const products = await productsRepository.find({
+        //     where: {
+        //         name: Like(`%${name}%`),
+        //         user: {
+        //             id: userId
+        //         }
+        //     },
+        //     relations: {
+        //         suppliers: true
+        //     }
+        // });
 
         return products;
     }
