@@ -23,6 +23,9 @@ class Address {
     @Column()
     code: string;
 
+    @OneToOne(() => Supplier, (supplier) => supplier.address)
+    supplier: Supplier;
+
     @CreateDateColumn({
         name: "createdat"
     })

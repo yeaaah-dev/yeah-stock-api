@@ -2,12 +2,18 @@ import { suppliersRepository } from './../../Suppliers/repositories/suppliersRep
 import { In } from "typeorm";
 import { Product } from "../entities/Product";
 import { productsRepository } from "../repositories/productsRepository"
+import { usersRepository } from '../../Users/repositories/usersRepository';
+import { AppError } from '../../../shared/errors/AppError';
 
 class ProductsService {
-    
-    async create(input: any): Promise<void> {
+       
+    async create(userId: string, input: any): Promise<void> {
         
         if (input.name.length <= 0 ) return;
+
+        const user = await usersRepository.findById(userId);
+
+        if (!user) throw new AppError("User not found", 404);
         
         const productAlredyExists = await productsRepository.findOne({
             where: {
@@ -24,15 +30,19 @@ class ProductsService {
         });
 
         input.suppliers = suppliers;
+        input.user = user;
 
         const product = productsRepository.create(input);
         await productsRepository.save(product);
     }
 
-    async get(id: string): Promise<Product>{
+    async get(userId: string, id: string): Promise<Product>{
         const product = await productsRepository.findOne({
             where: {
                 id,
+                user: {
+                    id: userId
+                }
             },
             relations: {
                 suppliers: true
@@ -44,10 +54,15 @@ class ProductsService {
         return product;
     }
 
-    async getList(skip: number, take: number): Promise<Product[]>{
+    async getList(userId: string, skip: number, take: number): Promise<Product[]>{
         const products = await productsRepository.find({
             skip: skip ,
             take: take,
+            where: {
+                user: {
+                    id: userId
+                }
+            },
             relations: {
                 suppliers: true
             }
@@ -75,6 +90,18 @@ class ProductsService {
         product.description = input.descricao;
 
         await productsRepository.save(product);
+    }
+
+    async delete(id: string): Promise<void>  {
+        const product = await productsRepository.findOne({
+            where: {
+                id
+            }
+        });
+
+        if (!product) return;
+        
+        await productsRepository.remove(product);
     }
 }
 

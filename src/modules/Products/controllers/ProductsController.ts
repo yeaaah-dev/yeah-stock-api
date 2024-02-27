@@ -5,20 +5,22 @@ class ProductsController {
     
     async create(request: Request, response: Response): Promise<Response> {
         const input = request.body;
+        const userId = request.user.id;
 
         const service = new ProductsService();
-        await service.create(input);
+        await service.create(userId, input);
 
         return response.status(201).send();
     }
 
     async get(request: Request, response: Response): Promise<Response> {
-        const { id } = request.params;
+        const { id: productId } = request.params;
+        const userId = request.user.id;
 
         const service = new ProductsService();
 
         try {
-            const output = await service.get(id);
+            const output = await service.get(userId, productId);
             return response.status(200).send(output);
         } catch(e) {
             console.log(e);
@@ -28,12 +30,13 @@ class ProductsController {
 
     async getList(request: Request, response: Response): Promise<Response> {
         const { skip, take } = request.query;  //TODO: Search por name -> enum Status active e inactive e all
+        const userId = request.user.id;
 
         const parsedSkip = parseInt(skip as string);
         const parsedTake =  parseInt(take as string)
 
         const service = new ProductsService();
-        const output = await service.getList(parsedSkip, parsedTake);
+        const output = await service.getList(userId, parsedSkip, parsedTake);
 
         return response.status(200).send(output);
     }
@@ -50,6 +53,15 @@ class ProductsController {
         } catch(e) {
             return response.status(404).send(e.message);
         }
+
+        return response.status(200).send();
+    }
+
+    async delete(request: Request, response: Response ): Promise<Response> {
+        const { id } = request.params;
+
+        const service = new ProductsService();
+        await service.delete(id);
 
         return response.status(200).send();
     }

@@ -1,5 +1,6 @@
-import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, PrimaryColumn, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Supplier } from "../../Suppliers/entities/Supplier";
+import { User } from "../../Users/entities/User";
 
 @Entity("products")
 class Product {
@@ -55,6 +56,9 @@ class Product {
         type: "text",
     })
     description: string;
+
+    @ManyToOne(() => User, (user) => user.products)
+    user: User;
 
     @CreateDateColumn({
         name: "createdat"
