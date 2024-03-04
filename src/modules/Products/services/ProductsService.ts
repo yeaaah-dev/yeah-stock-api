@@ -1,109 +1,107 @@
-import { suppliersRepository } from './../../Suppliers/repositories/suppliersRepository';
+import { suppliersRepository } from "./../../Suppliers/repositories/suppliersRepository";
 import { In, Like } from "typeorm";
 import { Product } from "../entities/Product";
-import { productsRepository } from "../repositories/productsRepository"
-import { usersRepository } from '../../Users/repositories/usersRepository';
-import { AppError } from '../../../shared/errors/AppError';
+import { productsRepository } from "../repositories/productsRepository";
+import { usersRepository } from "../../Users/repositories/usersRepository";
+import { AppError } from "../../../shared/errors/AppError";
 
 class ProductsService {
-       
-    async create(userId: string, input: any): Promise<void> {
-        
-        if (input.name.length <= 0 ) return;
+  async create(userId: string, input: any): Promise<void> {
+    if (input.name.length <= 0) return;
 
-        const user = await usersRepository.findById(userId);
+    const user = await usersRepository.findById(userId);
 
-        if (!user) throw new AppError("User not found", 404);
-        
-        const productAlredyExists = await productsRepository.findOne({
-            where: {
-                name: input.name
-            }
-        });
-        
-        if (productAlredyExists) return;
+    if (!user) throw new AppError("User not found", 404);
 
-        // const suppliers = await suppliersRepository.find({
-        //     where: {
-        //         id: In(input.suppliersIds)
-        //     }
-        // });
+    const productAlredyExists = await productsRepository.findOne({
+      where: {
+        name: input.name,
+      },
+    });
 
-        // input.suppliers = suppliers;
-        input.user = user;
+    if (productAlredyExists) return;
 
-        const product = productsRepository.create(input);
-        await productsRepository.save(product);
-    }
+    // const suppliers = await suppliersRepository.find({
+    //     where: {
+    //         id: In(input.suppliersIds)
+    //     }
+    // });
 
-    async get(userId: string, id: string): Promise<Product>{
-        const product = await productsRepository.findOne({
-            where: {
-                id,
-                user: {
-                    id: userId
-                }
-            },
-            relations: {
-                suppliers: true
-            }
-        });
+    // input.suppliers = suppliers;
+    input.user = user;
 
-        if (!product) throw new Error("Product not found!");
+    const product = productsRepository.create(input);
+    await productsRepository.save(product);
+  }
 
-        return product;
-    }
+  async get(userId: string, id: string): Promise<Product> {
+    const product = await productsRepository.findOne({
+      where: {
+        id,
+        user: {
+          id: userId,
+        },
+      },
+      relations: {
+        suppliers: true,
+      },
+    });
 
-    async getList(userId: string, name: string = ""): Promise<Product[]>{
-        const products = await productsRepository.findByName(userId, name);
+    if (!product) throw new Error("Product not found!");
 
-        // const products = await productsRepository.find({
-        //     where: {
-        //         name: Like(`%${name}%`),
-        //         user: {
-        //             id: userId
-        //         }
-        //     },
-        //     relations: {
-        //         suppliers: true
-        //     }
-        // });
+    return product;
+  }
 
-        return products;
-    }
+  async getList(userId: string, name: string = ""): Promise<Product[]> {
+    const products = await productsRepository.findByName(userId, name);
 
-    async update(id: string, input: any): Promise<void> {
-        const product = await productsRepository.findOne({
-            where: {
-                id
-            }
-        });
+    // const products = await productsRepository.find({
+    //     where: {
+    //         name: Like(`%${name}%`),
+    //         user: {
+    //             id: userId
+    //         }
+    //     },
+    //     relations: {
+    //         suppliers: true
+    //     }
+    // });
 
-        if (!product) throw new Error("Product not found!");
+    return products;
+  }
 
-        product.name = input.name;
-        product.quantity = input.quantity;
-        product.mesureUnity = input.mesureUnity;
-        product.purchasePrice = input.purchasePrice;
-        product.salesPrice = input.salesPrice;
-        product.currency = input.currency;
-        product.active = input.active;
-        product.description = input.descricao;
+  async update(id: string, input: any): Promise<void> {
+    const product = await productsRepository.findOne({
+      where: {
+        id,
+      },
+    });
 
-        await productsRepository.save(product);
-    }
+    if (!product) throw new Error("Product not found!");
 
-    async delete(id: string): Promise<void>  {
-        const product = await productsRepository.findOne({
-            where: {
-                id
-            }
-        });
+    product.name = input.name;
+    product.quantity = input.quantity;
+    product.measureUnity = input.mesureUnity;
+    product.purchasePrice = input.purchasePrice;
+    product.salesPrice = input.salesPrice;
+    product.currency = input.currency;
+    product.active = input.active;
+    product.description = input.description;
 
-        if (!product) return;
-        
-        await productsRepository.remove(product);
-    }
+    await productsRepository.save(product);
+  }
+
+  async delete(id: string): Promise<void> {
+    const product = await productsRepository.findOne({
+      where: {
+        id,
+      },
+    });
+
+    if (!product) return;
+
+    await productsRepository.remove(product);
+  }
 }
 
-export { ProductsService }
+export { ProductsService };
